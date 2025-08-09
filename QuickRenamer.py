@@ -15,7 +15,7 @@ except ImportError:
     print("Install with: pip install tkinterdnd2")
 
 
-class BatchRenamer:
+class BatchRenamer: #QuickRenamer
     """Main application class for the Batch File Renamer"""
     
     def __init__(self):
@@ -25,7 +25,9 @@ class BatchRenamer:
         else:
             self.root = tk.Tk()
         
-        self.root.title("Batch File Renamer")
+        self.root.title("QuickRenamer")
+        self.root.iconbitmap("myicon.ico")
+        self.root.resizable(False, False)
         self.root.geometry("800x600")
         self.root.minsize(600, 400)
         
@@ -36,7 +38,7 @@ class BatchRenamer:
         # Setup the GUI
         self.setup_gui()
         
-        # Configure drag and drop if available
+        # Configure drag and drop if available.
         if DRAG_DROP_AVAILABLE:
             self.setup_drag_drop()
     
