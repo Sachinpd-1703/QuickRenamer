@@ -24,5 +24,5 @@ Make sure you have Python 3.8+ installed.
 Install the required dependencies:
 
 ```bash
-pip install tkinterdnd2 pyinstaller
+pip install tkinterdnd2
 
