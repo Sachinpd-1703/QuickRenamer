@@ -5,7 +5,7 @@ from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
 import re
 
-# Try to import tkinterdnd2 for drag-and-drop functionality
+# tkinterdnd2 for drag-and-drop functionality
 try:
     from tkinterdnd2 import TkinterDnD, DND_FILES
     DRAG_DROP_AVAILABLE = True
