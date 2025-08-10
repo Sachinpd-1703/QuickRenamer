@@ -1,0 +1,21 @@
+QuickRenamer v1.0.0 — Initial Release
+QuickRenamer is a lightweight batch file renaming tool built with Python and Tkinter.
+This first release introduces a fast and simple way to rename multiple files at once, with a clean and intuitive GUI.
+
+Key Features in v1.0.0 :
+
+Select an entire folder of files and rename them in bulk
+
+Add prefixes, suffixes, or completely replace file names
+
+Automatic numbering support for organized sequences
+
+Live preview before renaming (optional toggle)
+
+Drag-and-drop file selection for convenience
+
+Minimal, responsive design that’s easy to use
+
+Developer Notes :
+This version focuses on stability, speed, and user-friendliness.
+Future updates will add advanced features like pattern-based renaming, undo functionality, and cross-platform packaging.
