@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
+import sv_ttk
 
 from renamer import FileRenamer
 from utils import resource_path, check_drag_drop, DRAG_DROP_AVAILABLE, DND_FILES
@@ -17,22 +18,26 @@ class BatchRenamer:
         else:
             self.root = tk.Tk()
 
-        self.root.title("QuickRenamer")
-
         try:
             icon_file = resource_path("myicon.ico")
             self.root.iconbitmap(icon_file)
         except Exception as e:
             print(f"Icon not found or failed to load, using default. ({e})")
 
+        self.root.title("QuickRenamer")
+
         self.root.resizable(False, False)
         self.root.geometry("800x600")
         self.root.minsize(600, 400)
+
+        sv_ttk.set_theme("dark") # Use dark theme by default
 
         # State
         self.selected_files = []
         self.preview_names = []
         self.renamer = FileRenamer()
+        self.undo_stack = []
+        self.redo_stack = []
 
         # Setup GUI
         self.setup_gui()
@@ -129,7 +134,24 @@ class BatchRenamer:
         list_frame = ttk.LabelFrame(parent, text="Files to Rename", padding="5")
         list_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
         list_frame.columnconfigure(0, weight=1)
-        list_frame.rowconfigure(0, weight=1)
+        list_frame.rowconfigure(1, weight=1)
+
+        # naya toolbar for move up/down and remove
+        button_toolbar = ttk.Frame(list_frame)
+        button_toolbar.grid(row=0, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 5))
+
+        # --- Move Up/Down & Remove Buttons ---
+        ttk.Button(button_toolbar, text="▲ Move Up", command=self.move_item_up).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_toolbar, text="▼ Move Down", command=self.move_item_down).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_toolbar, text="Remove", command=self.remove_selected).pack(side=tk.LEFT, padx=(0, 5))
+
+        # --- Theame ---
+        self.theme_switch = ttk.Checkbutton(
+            button_toolbar,
+            text="🌙",
+            style="Switch.TCheckbutton",
+            command=self.toggle_theme
+        ).pack(side=tk.RIGHT, padx=(5, 0))
 
         columns = ('original', 'preview')
         self.file_tree = ttk.Treeview(list_frame, columns=columns, show='headings', height=15)
