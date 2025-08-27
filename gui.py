@@ -25,10 +25,21 @@ class BatchRenamer:
             print(f"Icon not found or failed to load, using default. ({e})")
 
         self.root.title("QuickRenamer")
-
-        self.root.resizable(False, False)
-        self.root.geometry("800x600")
+        # Fixed size
+        win_w, win_h = 800, 600
         self.root.minsize(600, 400)
+
+        # Get screen width & height
+        screen_w = self.root.winfo_screenwidth()
+        screen_h = self.root.winfo_screenheight()
+
+        # Calculate x, y for centering
+        x = (screen_w - win_w) // 2
+        y = (screen_h - win_h) // 2
+
+        # Apply geometry with position
+        self.root.geometry(f"{win_w}x{win_h}+{x}+{y}")
+        self.root.resizable(False, False)
 
         sv_ttk.set_theme("dark") # Use dark theme by default
 
@@ -151,7 +162,9 @@ class BatchRenamer:
             text="🌙",
             style="Switch.TCheckbutton",
             command=self.toggle_theme
-        ).pack(side=tk.RIGHT, padx=(5, 0))
+        )
+        self.theme_switch.pack(side=tk.RIGHT, padx=(5, 0))
+
 
         columns = ('original', 'preview')
         self.file_tree = ttk.Treeview(list_frame, columns=columns, show='headings', height=15)
@@ -382,12 +395,13 @@ class BatchRenamer:
         """Switches the application's theme between light and dark mode."""
         if sv_ttk.get_theme() == "light":
             sv_ttk.set_theme("dark")
-            self.theme_switch.config(text="☀️ Light Mode")
+            self.theme_switch.config(text="🌙")
             self.status_var.set("Theme changed to Dark Mode")
         else:
             sv_ttk.set_theme("light")
-            self.theme_switch.config(text="🌙 Dark Mode")
+            self.theme_switch.config(text="☀️")
             self.status_var.set("Theme changed to Light Mode")
+
 
     def run(self):
         """Start the application"""
