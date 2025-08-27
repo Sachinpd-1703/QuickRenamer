@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
-import sv_ttk
+import sv_ttk # For themes 
 
 from renamer import FileRenamer
 from utils import resource_path, check_drag_drop, DRAG_DROP_AVAILABLE, DND_FILES
@@ -164,9 +164,9 @@ class BatchRenamer:
         h_scrollbar = ttk.Scrollbar(list_frame, orient=tk.HORIZONTAL, command=self.file_tree.xview)
         self.file_tree.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
 
-        self.file_tree.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        v_scrollbar.grid(row=0, column=1, sticky=(tk.N, tk.S))
-        h_scrollbar.grid(row=1, column=0, sticky=(tk.W, tk.E))
+        self.file_tree.grid(row=1, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        v_scrollbar.grid(row=1, column=1, sticky=(tk.N, tk.S))
+        h_scrollbar.grid(row=2, column=0, sticky=(tk.W, tk.E))
 
     def setup_action_buttons(self, parent):
         button_frame = ttk.Frame(parent)
@@ -289,6 +289,105 @@ class BatchRenamer:
         # Refresh the file list with updated names
         self.update_file_list()
         self.update_preview()
+
+    def undo_rename(self):
+        if not self.undo_stack:
+            return
+        
+        last_rename_operation = self.undo_stack.pop()
+        redo_operation = []
+
+        for old_path, new_path in reversed(last_rename_operation):
+            try:
+                new_path.rename(old_path)
+                redo_operation.append((old_path, new_path))
+            except Exception as e:
+                print(f"Undo Error: {e}")
+                
+        self.redo_stack.append(list(reversed(redo_operation)))
+        self.clear_files()
+        self.status_var.set("Last operation undone.")
+        self.update_action_buttons_state()
+
+    def redo_rename(self):
+        if not self.redo_stack:
+            return
+            
+        last_undo_operation = self.redo_stack.pop()
+        undo_operation = []
+        
+        for old_path, new_path in last_undo_operation:
+            try:
+                old_path.rename(new_path)
+                undo_operation.append((old_path, new_path))
+            except Exception as e:
+                print(f"Redo Error: {e}")
+                
+        self.undo_stack.append(undo_operation)
+        self.clear_files()
+        self.status_var.set("Last operation redone.")
+        self.update_action_buttons_state()
+
+    def update_action_buttons_state(self):
+        self.undo_button.config(state=tk.NORMAL if self.undo_stack else tk.DISABLED)
+        self.redo_button.config(state=tk.NORMAL if self.redo_stack else tk.DISABLED)
+
+    def move_item_up(self):
+        selected_items = self.file_tree.selection()
+        if not selected_items:
+            return
+            
+        for item in selected_items:
+            index = self.file_tree.index(item)
+            if index > 0:
+                # List mein file ko upar move karein
+                self.selected_files.insert(index - 1, self.selected_files.pop(index))
+        
+        self.update_preview()
+        # Focus aur selection ko maintain rakhein
+        self.file_tree.selection_set(selected_items)
+
+    def move_item_down(self):
+        selected_items = self.file_tree.selection()
+        if not selected_items:
+            return
+
+        # Reverse order mein loop chalayein taaki index aage-peeche na ho
+        for item in reversed(selected_items):
+            index = self.file_tree.index(item)
+            if index < len(self.selected_files) - 1:
+                # List mein file ko neeche move karein
+                self.selected_files.insert(index + 1, self.selected_files.pop(index))
+
+        self.update_preview()
+        # Focus aur selection ko maintain rakhein
+        self.file_tree.selection_set(selected_items)
+
+    def remove_selected(self):
+        selected_items = self.file_tree.selection()
+        if not selected_items:
+            messagebox.showwarning("No Selection", "Please select a file to remove.")
+            return
+            
+        # Highest index se remove karna shuru karein taaki index shift na ho
+        indices_to_remove = sorted([self.file_tree.index(item) for item in selected_items], reverse=True)
+        
+        for index in indices_to_remove:
+            self.selected_files.pop(index)
+            
+        self.update_preview()
+        self.status_var.set(f"Removed {len(indices_to_remove)} files. Total: {len(self.selected_files)} files")
+
+    def toggle_theme(self):
+        """Switches the application's theme between light and dark mode."""
+        if sv_ttk.get_theme() == "light":
+            sv_ttk.set_theme("dark")
+            self.theme_switch.config(text="☀️ Light Mode")
+            self.status_var.set("Theme changed to Dark Mode")
+        else:
+            sv_ttk.set_theme("light")
+            self.theme_switch.config(text="🌙 Dark Mode")
+            self.status_var.set("Theme changed to Light Mode")
 
     def run(self):
         """Start the application"""
