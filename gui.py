@@ -42,6 +42,24 @@ class BatchRenamer:
         self.root.resizable(False, False)
 
         sv_ttk.set_theme("dark") # Use dark theme by default
+        # Palettes
+        self.light_palette = {
+            "bg": "white",
+            "fg": "black",
+            "accent": "#0078D7"
+        }
+        self.dark_palette = {
+            "bg": "#2e2e2e",
+            "fg": "white",
+            "accent": "#4A90E2"
+        }
+
+        # Start with dark mode
+        self.current_theme = "dark"
+        self.apply_palette(self.dark_palette)
+
+        # Status variable
+        self.status_var = tk.StringVar(value="Dark Mode Enabled")
 
         # State
         self.selected_files = []
@@ -392,15 +410,25 @@ class BatchRenamer:
         self.status_var.set(f"Removed {len(indices_to_remove)} files. Total: {len(self.selected_files)} files")
 
     def toggle_theme(self):
-        """Switches the application's theme between light and dark mode."""
-        if sv_ttk.get_theme() == "light":
-            sv_ttk.set_theme("dark")
-            self.theme_switch.config(text="🌙")
+        if self.current_theme == "light":
+            self.current_theme = "dark"
+            self.apply_palette(self.dark_palette)
+            self.theme_switch.config(text="☀️")
             self.status_var.set("Theme changed to Dark Mode")
         else:
-            sv_ttk.set_theme("light")
-            self.theme_switch.config(text="☀️")
+            self.current_theme = "light"
+            self.apply_palette(self.light_palette)
+            self.theme_switch.config(text="🌙")
             self.status_var.set("Theme changed to Light Mode")
+
+    def apply_palette(self, palette):
+        """Apply a given color palette to the root window and style."""
+        self.root.configure(bg=palette["bg"])
+
+        style = ttk.Style(self.root)
+        style.configure("TLabel", background=palette["bg"], foreground=palette["fg"])
+        style.configure("TButton", background=palette["accent"], foreground=palette["fg"])
+        style.configure("TFrame", background=palette["bg"])
 
 
     def run(self):
