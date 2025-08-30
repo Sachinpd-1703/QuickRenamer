@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
-import sv_ttk # For themes tepmerary
 
 from renamer import FileRenamer
 from utils import resource_path, check_drag_drop, DRAG_DROP_AVAILABLE, DND_FILES
@@ -11,7 +10,6 @@ class BatchRenamer:
     """Main application class for the Batch File Renamer"""
 
     def __init__(self):
-        # Initialize Tk root (DnD if available)
         if DRAG_DROP_AVAILABLE:
             from tkinterdnd2 import TkinterDnD
             self.root = TkinterDnD.Tk()
@@ -25,7 +23,7 @@ class BatchRenamer:
             print(f"Icon not found or failed to load, using default. ({e})")
 
         self.root.title("QuickRenamer")
-        self.center_window(800, 600)  # auto centers thr window
+        self.center_window(800, 600)
         self.root.resizable(False, False)
 
         # Start with dark mode
@@ -33,7 +31,6 @@ class BatchRenamer:
         self.style = ttk.Style(self.root)
         self.theme_var = tk.StringVar(value="dark")
         self.style.theme_use("xpnative")
-        # self.style.theme_use("clam") 
 
         # Status variable
         self.status_var = tk.StringVar(value="Dark Mode Enabled")
@@ -154,10 +151,8 @@ class BatchRenamer:
         # --- Theame ---
         self.theme_switch = ttk.Checkbutton(
             button_toolbar,
-            text="🌙",
-            # style="TCheckbutton",
+            text="Dark Mode",
             command=self.apply_theme,
-            # indicatoron=False
         )
         self.theme_switch.pack(side=tk.RIGHT, padx=(5, 0))
 
@@ -198,18 +193,16 @@ class BatchRenamer:
         theme = self.theme_var.get()
 
         if theme == "dark":
-            # Dark theme colors
             bg_color = "#221f1f"
-            fg_color = "#D8D8E7"
+            fg_color = "#FFFFFF"
             entry_bg = "#1c1e1f"
-            entry_fg = "#4B4B4D"  # Ensure readable text in dark entry
+            entry_fg = "#4B4B4D"
             button_bg = "#2B2E2F"
             select_bg = '#0078d7'
             tree_heading_bg = '#3c3f41'
-            drop_label_fg = "#FFFFFF" # Make drop label visible in dark mode
+            drop_label_fg = "#FFFFFF"
             self.theme_var.set("light")
         else:
-            # Light theme colors
             bg_color = 'SystemButtonFace'
             fg_color = 'SystemWindowText'
             entry_bg = 'SystemWindow'
@@ -232,7 +225,7 @@ class BatchRenamer:
         # --- Buttons ---
         self.style.configure('TButton',
                             background=button_bg,
-                            foreground="black",
+                            foreground=fg_color if theme == 'light' else 'black',
                             borderwidth=2,
                             focusthickness=2,
                             focuscolor=fg_color)
@@ -249,7 +242,7 @@ class BatchRenamer:
         # --- Entry ---
         self.style.configure('TEntry',
                             fieldbackground=entry_bg,
-                            foreground=entry_fg, # Use entry_fg for text color
+                            foreground=entry_fg,
                             insertcolor=fg_color,
                             borderwidth=2,
                             focusthickness=2,
@@ -258,13 +251,13 @@ class BatchRenamer:
         # --- Treeview ---
         self.style.configure('Treeview',
                             background=entry_bg,
-                            foreground="#FFFFFF", # Use entry_fg for Treeview text color
+                            foreground=fg_color,
                             fieldbackground=entry_bg,
                             rowheight=25,
                             borderwidth=1)
         self.style.configure('Treeview.Heading',
                             background=tree_heading_bg,
-                            foreground="#221f1f",
+                            foreground=fg_color if theme == 'light' else 'black',
                             relief='flat')
         self.style.map('Treeview.Heading',
                     background=[('active', button_bg)])
@@ -279,16 +272,9 @@ class BatchRenamer:
 
         if hasattr(self, 'status_bar'):
             self.status_bar.config(
-                background=button_bg if theme == 'dark' else bg_color,
+                background=button_bg if theme == 'light' else bg_color,
                 foreground=fg_color
             )
-        
-        # Update toggle button symbol
-        if self.theme_var.get() == "dark":
-            self.theme_switch.config(text="🌙")  # dark mode active
-        else:
-            self.theme_switch.config(text="☀️")  # light mode active
-        
 
     def center_window(self, win_w, win_h):
         # Get the screen width and height
@@ -454,32 +440,45 @@ class BatchRenamer:
         selected_items = self.file_tree.selection()
         if not selected_items:
             return
-            
-        for item in selected_items:
-            index = self.file_tree.index(item)
-            if index > 0:
-                # List mein file ko upar move karein
-                self.selected_files.insert(index - 1, self.selected_files.pop(index))
         
-        self.update_preview()
-        # Focus aur selection ko maintain rakhein
+        all_items = list(self.file_tree.get_children())
+        # Sort selected items by their index ascending---- to avoid messing order when moving up
+        selected_indices = sorted([all_items.index(item) for item in selected_items])
+            
+        for index in selected_indices:
+            item = all_items[index]
+            if index == 0:
+                self.file_tree.move(item, '', 'end')
+            else:
+                self.file_tree.move(item, '', index - 1)
+        
+        # Re-select moved items----
         self.file_tree.selection_set(selected_items)
+
+        for item in selected_items:
+            self.file_tree.see(item)
 
     def move_item_down(self):
         selected_items = self.file_tree.selection()
         if not selected_items:
             return
 
-        # Reverse order mein loop chalayein taaki index aage-peeche na ho
-        for item in reversed(selected_items):
-            index = self.file_tree.index(item)
-            if index < len(self.selected_files) - 1:
-                # List mein file ko neeche move karein
-                self.selected_files.insert(index + 1, self.selected_files.pop(index))
+        all_items = list(self.file_tree.get_children())
 
-        self.update_preview()
-        # Focus aur selection ko maintain rakhein
+        selected_indices = sorted([all_items.index(item) for item in selected_items], reverse=True)
+
+        for index in selected_indices:
+            item = all_items[index]
+            if index == len(all_items) - 1:
+                self.file_tree.move(item, '', 0)
+            else:
+                self.file_tree.move(item, '', index + 1)
+
+        # Re-select moved items----
         self.file_tree.selection_set(selected_items)
+
+        for item in selected_items:
+            self.file_tree.see(item)
 
     def remove_selected(self):
         selected_items = self.file_tree.selection()
@@ -496,28 +495,6 @@ class BatchRenamer:
         self.update_preview()
         self.status_var.set(f"Removed {len(indices_to_remove)} files. Total: {len(self.selected_files)} files")
 
-    # def toggle_theme(self):
-    #     if self.current_theme == "light":
-    #         self.current_theme = "dark"
-    #         self.apply_palette(self.dark_palette)
-    #         self.theme_switch.config(text="☀️")
-    #         self.status_var.set("Theme changed to Dark Mode")
-    #     else:
-    #         self.current_theme = "light"
-    #         self.apply_palette(self.light_palette)
-    #         self.theme_switch.config(text="🌙")
-    #         self.status_var.set("Theme changed to Light Mode")
-
-    # def apply_palette(self, palette):
-    #     """Apply a given color palette to the root window and style."""
-    #     self.root.configure(bg=palette["bg"])
-
-    #     style = ttk.Style(self.root)
-    #     style.configure("TLabel", background=palette["bg"], foreground=palette["fg"])
-    #     style.configure("TButton", background=palette["accent"], foreground=palette["fg"])
-    #     style.configure("TFrame", background=palette["bg"])
-
-
     def run(self):
-        """Start the application"""
+        """Start the application 👌"""
         self.root.mainloop()
