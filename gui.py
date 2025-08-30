@@ -20,14 +20,15 @@ class BatchRenamer:
         self.root.title("QuickRenamer")
 
         try:
-            icon_file = resource_path("myicon.ico")
+            icon_file = resource_path("myicon.ico")  
             self.root.iconbitmap(icon_file)
         except Exception as e:
             print(f"Icon not found or failed to load, using default. ({e})")
 
+        self.root.title("QuickRenamer")
+        self.center_window(800, 600)   
         self.root.resizable(False, False)
-        self.root.geometry("800x600")
-        self.root.minsize(600, 400)
+
 
         # State
         self.selected_files = []
