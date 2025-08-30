@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from pathlib import Path
-import sv_ttk # For themes 
+import sv_ttk # For themes tepmerary
 
 from renamer import FileRenamer
 from utils import resource_path, check_drag_drop, DRAG_DROP_AVAILABLE, DND_FILES
@@ -25,43 +25,16 @@ class BatchRenamer:
             print(f"Icon not found or failed to load, using default. ({e})")
 
         self.root.title("QuickRenamer")
-        # Fixed size
-        win_w, win_h = 800, 600
-        self.root.minsize(600, 400)
-
-        # Get screen width & height
-        screen_w = self.root.winfo_screenwidth()
-        screen_h = self.root.winfo_screenheight()
-
-        # Calculate x, y for centering
-        x = (screen_w - win_w) // 2
-        y = (screen_h - win_h) // 2
-
-        # Apply geometry with position
-        self.root.geometry(f"{win_w}x{win_h}+{x}+{y}")
+        self.center_window(800, 600)  # auto centers thr window
         self.root.resizable(False, False)
 
-        sv_ttk.set_theme("dark") # Use dark theme by default
-        # Palettes
-        self.light_palette = {
-            "bg": "white",
-            "fg": "black",
-            "accent": "#0078D7"
-        }
-        self.dark_palette = {
-            "bg": "#2e2e2e",
-            "fg": "white",
-            "accent": "#4A90E2"
-        }
-
         # Start with dark mode
-        self.current_theme = "dark"
-        self.apply_palette(self.dark_palette)
+        self.apply_theme()
 
         # Status variable
         self.status_var = tk.StringVar(value="Dark Mode Enabled")
 
-        # State
+        # State----
         self.selected_files = []
         self.preview_names = []
         self.renamer = FileRenamer()
@@ -214,6 +187,43 @@ class BatchRenamer:
     def setup_drag_drop(self):
         self.file_tree.drop_target_register(DND_FILES)
         self.file_tree.dnd_bind('<<Drop>>', self.on_drop)
+
+    def apply_theme(self):
+        """Applies the selected (light or dark) theme to the application."""
+        theme = self.theme_var.get()
+
+        if theme == "dark":
+            # Dark theme colors
+            bg_color = '#2b2b2b'
+            fg_color = '#dcdcdc'
+            entry_bg = '#3c3f41'
+            entry_fg = '#dcdcdc'
+            button_bg = '#4e5254'
+            select_bg = '#0078d7'
+            tree_heading_bg = '#3c3f41'
+            drop_label_fg = '#a9a9a9'
+        else:
+            # Light theme colors (using system defaults)
+            bg_color = 'SystemButtonFace'
+            fg_color = 'SystemWindowText'
+            entry_bg = 'SystemWindow'
+            entry_fg = 'SystemWindowText'
+            button_bg = 'SystemButtonFace'
+            select_bg = '#0078d7'
+            tree_heading_bg = 'SystemButtonFace'
+            drop_label_fg = 'gray'
+
+    def center_window(self, win_w, win_h):
+        # Get the screen width and height
+        screen_w = self.root.winfo_screenwidth()
+        screen_h = self.root.winfo_screenheight()
+
+        # Calculate position x, y
+        x = (screen_w // 2) - (win_w // 2)
+        y = (screen_h // 2) - (win_h // 2)
+
+        # Set the geometry
+        self.root.geometry(f"{win_w}x{win_h}+{x}+{y}")
 
     # ---------------- File Handling ----------------
 
