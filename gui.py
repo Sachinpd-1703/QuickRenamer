@@ -199,14 +199,14 @@ class BatchRenamer:
 
         if theme == "dark":
             # Dark theme colors
-            bg_color = '#2b2b2b'
-            fg_color = '#dcdcdc'
-            entry_bg = '#3c3f41'
-            entry_fg = '#dcdcdc'
-            button_bg = "#616567"
+            bg_color = "#221f1f"
+            fg_color = "#D8D8E7"
+            entry_bg = "#1c1e1f"
+            entry_fg = "#4B4B4D"  # Ensure readable text in dark entry
+            button_bg = "#2B2E2F"
             select_bg = '#0078d7'
             tree_heading_bg = '#3c3f41'
-            drop_label_fg = '#a9a9a9'
+            drop_label_fg = "#FFFFFF" # Make drop label visible in dark mode
             self.theme_var.set("light")
         else:
             # Light theme colors
@@ -219,10 +219,6 @@ class BatchRenamer:
             tree_heading_bg = 'SystemButtonFace'
             drop_label_fg = 'gray'
             self.theme_var.set("dark")
-            
-
-        # Use clam ---
-        # self.style.theme_use('vista')
 
         # Apply to root window
         self.root.configure(bg=bg_color)
@@ -236,7 +232,7 @@ class BatchRenamer:
         # --- Buttons ---
         self.style.configure('TButton',
                             background=button_bg,
-                            foreground=fg_color,
+                            foreground="black",
                             borderwidth=2,
                             focusthickness=2,
                             focuscolor=fg_color)
@@ -253,7 +249,7 @@ class BatchRenamer:
         # --- Entry ---
         self.style.configure('TEntry',
                             fieldbackground=entry_bg,
-                            foreground=entry_fg,
+                            foreground=entry_fg, # Use entry_fg for text color
                             insertcolor=fg_color,
                             borderwidth=2,
                             focusthickness=2,
@@ -262,19 +258,20 @@ class BatchRenamer:
         # --- Treeview ---
         self.style.configure('Treeview',
                             background=entry_bg,
-                            foreground=fg_color,
+                            foreground="#FFFFFF", # Use entry_fg for Treeview text color
                             fieldbackground=entry_bg,
                             rowheight=25,
                             borderwidth=1)
         self.style.configure('Treeview.Heading',
                             background=tree_heading_bg,
-                            foreground=fg_color,
+                            foreground="#221f1f",
                             relief='flat')
         self.style.map('Treeview.Heading',
                     background=[('active', button_bg)])
         self.style.map('Treeview',
                     background=[('selected', select_bg)],
-                    foreground=[('selected', 'white')])
+                    foreground=[('selected', 'white')],
+                    fieldbackground=[('selected', select_bg)]) # Ensure selected background is correct
 
         # --- Custom Widgets (drop label, status bar) ---
         if hasattr(self, 'drop_label'):
@@ -291,8 +288,7 @@ class BatchRenamer:
             self.theme_switch.config(text="🌙")  # dark mode active
         else:
             self.theme_switch.config(text="☀️")  # light mode active
-
-
+        
 
     def center_window(self, win_w, win_h):
         # Get the screen width and height
