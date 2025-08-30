@@ -10,7 +10,6 @@ class BatchRenamer:
     """Main application class for the Batch File Renamer"""
 
     def __init__(self):
-        # Initialize Tk root (DnD if available)
         if DRAG_DROP_AVAILABLE:
             from tkinterdnd2 import TkinterDnD
             self.root = TkinterDnD.Tk()
@@ -26,8 +25,7 @@ class BatchRenamer:
             print(f"Icon not found or failed to load, using default. ({e})")
 
         self.root.resizable(False, False)
-        self.root.geometry("800x600")
-        self.root.minsize(600, 400)
+        self.center_window(800, 600)
 
         # State
         self.selected_files = []
@@ -129,7 +127,16 @@ class BatchRenamer:
         list_frame = ttk.LabelFrame(parent, text="Files to Rename", padding="5")
         list_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
         list_frame.columnconfigure(0, weight=1)
-        list_frame.rowconfigure(0, weight=1)
+        list_frame.rowconfigure(1, weight=1)
+
+        # naya toolbar for move up/down and remove
+        button_toolbar = ttk.Frame(list_frame)
+        button_toolbar.grid(row=0, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 5))
+
+        # --- Move Up/Down & Remove Buttons ---
+        ttk.Button(button_toolbar, text="▲ Move Up", command=self.move_item_up).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_toolbar, text="▼ Move Down", command=self.move_item_down).pack(side=tk.LEFT, padx=(0, 5))
+        ttk.Button(button_toolbar, text="Remove", command=self.remove_selected).pack(side=tk.LEFT, padx=(0, 5))
 
         columns = ('original', 'preview')
         self.file_tree = ttk.Treeview(list_frame, columns=columns, show='headings', height=15)
@@ -161,6 +168,18 @@ class BatchRenamer:
     def setup_drag_drop(self):
         self.file_tree.drop_target_register(DND_FILES)
         self.file_tree.dnd_bind('<<Drop>>', self.on_drop)
+
+    def center_window(self, win_w, win_h):
+        # Get the screen width and height
+        screen_w = self.root.winfo_screenwidth()
+        screen_h = self.root.winfo_screenheight()
+
+        # Calculate position x, y
+        x = (screen_w // 2) - (win_w // 2)
+        y = (screen_h // 2) - (win_h // 2)
+
+        # Set the geometry
+        self.root.geometry(f"{win_w}x{win_h}+{x}+{y}")
 
     # ---------------- File Handling ----------------
 
