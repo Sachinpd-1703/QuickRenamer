@@ -29,7 +29,11 @@ class BatchRenamer:
         self.root.resizable(False, False)
 
         # Start with dark mode
-        self.apply_theme()
+        # Theme Management
+        self.style = ttk.Style(self.root)
+        self.theme_var = tk.StringVar(value="dark")
+        self.style.theme_use("xpnative")
+        # self.style.theme_use("clam") 
 
         # Status variable
         self.status_var = tk.StringVar(value="Dark Mode Enabled")
@@ -151,8 +155,9 @@ class BatchRenamer:
         self.theme_switch = ttk.Checkbutton(
             button_toolbar,
             text="🌙",
-            style="Switch.TCheckbutton",
-            command=self.toggle_theme
+            # style="TCheckbutton",
+            command=self.apply_theme,
+            # indicatoron=False
         )
         self.theme_switch.pack(side=tk.RIGHT, padx=(5, 0))
 
@@ -198,12 +203,13 @@ class BatchRenamer:
             fg_color = '#dcdcdc'
             entry_bg = '#3c3f41'
             entry_fg = '#dcdcdc'
-            button_bg = '#4e5254'
+            button_bg = "#616567"
             select_bg = '#0078d7'
             tree_heading_bg = '#3c3f41'
             drop_label_fg = '#a9a9a9'
+            self.theme_var.set("light")
         else:
-            # Light theme colors (using system defaults)
+            # Light theme colors
             bg_color = 'SystemButtonFace'
             fg_color = 'SystemWindowText'
             entry_bg = 'SystemWindow'
@@ -212,6 +218,81 @@ class BatchRenamer:
             select_bg = '#0078d7'
             tree_heading_bg = 'SystemButtonFace'
             drop_label_fg = 'gray'
+            self.theme_var.set("dark")
+            
+
+        # Use clam ---
+        # self.style.theme_use('vista')
+
+        # Apply to root window
+        self.root.configure(bg=bg_color)
+
+        # --- Frame and Labels ---
+        self.style.configure('TFrame', background=bg_color)
+        self.style.configure('TLabel', background=bg_color, foreground=fg_color)
+        self.style.configure('TLabelframe', background=bg_color, foreground=fg_color, borderwidth=2)
+        self.style.configure('TLabelframe.Label', background=bg_color, foreground=fg_color)
+
+        # --- Buttons ---
+        self.style.configure('TButton',
+                            background=button_bg,
+                            foreground=fg_color,
+                            borderwidth=2,
+                            focusthickness=2,
+                            focuscolor=fg_color)
+        self.style.map('TButton',
+                    background=[('active', '#6e7274')],
+                    foreground=[('disabled', '#a9a9a9')])
+
+        # --- Checkbutton ---
+        self.style.configure('TCheckbutton', background=bg_color, foreground=fg_color)
+        self.style.map('TCheckbutton',
+                    background=[('active', bg_color)],
+                    foreground=[('disabled', '#888888')])
+
+        # --- Entry ---
+        self.style.configure('TEntry',
+                            fieldbackground=entry_bg,
+                            foreground=entry_fg,
+                            insertcolor=fg_color,
+                            borderwidth=2,
+                            focusthickness=2,
+                            focuscolor=fg_color)
+
+        # --- Treeview ---
+        self.style.configure('Treeview',
+                            background=entry_bg,
+                            foreground=fg_color,
+                            fieldbackground=entry_bg,
+                            rowheight=25,
+                            borderwidth=1)
+        self.style.configure('Treeview.Heading',
+                            background=tree_heading_bg,
+                            foreground=fg_color,
+                            relief='flat')
+        self.style.map('Treeview.Heading',
+                    background=[('active', button_bg)])
+        self.style.map('Treeview',
+                    background=[('selected', select_bg)],
+                    foreground=[('selected', 'white')])
+
+        # --- Custom Widgets (drop label, status bar) ---
+        if hasattr(self, 'drop_label'):
+            self.drop_label.config(background=bg_color, foreground=drop_label_fg)
+
+        if hasattr(self, 'status_bar'):
+            self.status_bar.config(
+                background=button_bg if theme == 'dark' else bg_color,
+                foreground=fg_color
+            )
+        
+        # Update toggle button symbol
+        if self.theme_var.get() == "dark":
+            self.theme_switch.config(text="🌙")  # dark mode active
+        else:
+            self.theme_switch.config(text="☀️")  # light mode active
+
+
 
     def center_window(self, win_w, win_h):
         # Get the screen width and height
@@ -419,26 +500,26 @@ class BatchRenamer:
         self.update_preview()
         self.status_var.set(f"Removed {len(indices_to_remove)} files. Total: {len(self.selected_files)} files")
 
-    def toggle_theme(self):
-        if self.current_theme == "light":
-            self.current_theme = "dark"
-            self.apply_palette(self.dark_palette)
-            self.theme_switch.config(text="☀️")
-            self.status_var.set("Theme changed to Dark Mode")
-        else:
-            self.current_theme = "light"
-            self.apply_palette(self.light_palette)
-            self.theme_switch.config(text="🌙")
-            self.status_var.set("Theme changed to Light Mode")
+    # def toggle_theme(self):
+    #     if self.current_theme == "light":
+    #         self.current_theme = "dark"
+    #         self.apply_palette(self.dark_palette)
+    #         self.theme_switch.config(text="☀️")
+    #         self.status_var.set("Theme changed to Dark Mode")
+    #     else:
+    #         self.current_theme = "light"
+    #         self.apply_palette(self.light_palette)
+    #         self.theme_switch.config(text="🌙")
+    #         self.status_var.set("Theme changed to Light Mode")
 
-    def apply_palette(self, palette):
-        """Apply a given color palette to the root window and style."""
-        self.root.configure(bg=palette["bg"])
+    # def apply_palette(self, palette):
+    #     """Apply a given color palette to the root window and style."""
+    #     self.root.configure(bg=palette["bg"])
 
-        style = ttk.Style(self.root)
-        style.configure("TLabel", background=palette["bg"], foreground=palette["fg"])
-        style.configure("TButton", background=palette["accent"], foreground=palette["fg"])
-        style.configure("TFrame", background=palette["bg"])
+    #     style = ttk.Style(self.root)
+    #     style.configure("TLabel", background=palette["bg"], foreground=palette["fg"])
+    #     style.configure("TButton", background=palette["accent"], foreground=palette["fg"])
+    #     style.configure("TFrame", background=palette["bg"])
 
 
     def run(self):
