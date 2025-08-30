@@ -326,7 +326,7 @@ class BatchRenamer:
         # Clear existing items
         self.file_tree.delete(*self.file_tree.get_children())
         
-        # Add current files
+        # Add current filess
         for idx, file_path in enumerate(self.selected_files):
             preview_name = self.preview_names[idx] if idx < len(self.preview_names) else ""
             self.file_tree.insert("", "end", values=(file_path.name, preview_name))
