@@ -49,18 +49,36 @@ class FileRenamer:
         success_count = 0
         error_count = 0
         errors = []
-        rename_history = []  
+        self.rename_history = []  # reset history each run
 
         for i, (old_path, new_name) in enumerate(zip(selected_files, preview_names)):
             try:
                 safe_name = self.get_safe_filename(old_path.parent, new_name)
                 new_path = old_path.parent / safe_name
                 old_path.rename(new_path)
-                rename_history.append((old_path, new_path))
+
+                # track rename history for undo
+                self.rename_history.append((old_path, new_path))
+
+                # update reference in list
                 selected_files[i] = new_path
                 success_count += 1
             except Exception as e:
                 error_count += 1
                 errors.append(f"{old_path.name}: {str(e)}")
 
-        return success_count, error_count, errors, rename_history
+        # ✅ Only return 3 values (to match your GUI code)
+        return success_count, error_count, errors
+
+    def undo_last_rename(self):
+        """Undo the last batch of renames (if possible)."""
+        restored = 0
+        for old_path, new_path in reversed(self.rename_history):
+            try:
+                if new_path.exists():
+                    new_path.rename(old_path)
+                    restored += 1
+            except Exception:
+                pass
+        self.rename_history = []
+        return restored
