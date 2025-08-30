@@ -29,7 +29,6 @@ class BatchRenamer:
         self.center_window(800, 600)   
         self.root.resizable(False, False)
 
-
         # State
         self.selected_files = []
         self.preview_names = []
