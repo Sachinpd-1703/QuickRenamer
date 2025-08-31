@@ -195,7 +195,7 @@ class BatchRenamer:
         theme = self.theme_var.get()
 
         if theme == "dark":
-            bg_color = "#4E4F52"
+            bg_color = "#373737"
             fg_color = "#FFFFFF"
             entry_bg = "#484747"
             entry_fg = "#323131"
@@ -204,6 +204,7 @@ class BatchRenamer:
             tree_heading_bg = '#3c3f41'
             drop_label_fg = "#FFFFFF"
             self.theme_var.set("light")
+            self.status_var.set("Theme changed to Dark Mode")
         else:
             bg_color = 'SystemButtonFace'
             fg_color = 'SystemWindowText'
@@ -214,6 +215,7 @@ class BatchRenamer:
             tree_heading_bg = 'SystemButtonFace'
             drop_label_fg = 'gray'
             self.theme_var.set("dark")
+            self.status_var.set("Theme changed to Light Mode")
 
         # Apply to root window
         self.root.configure(bg=bg_color)
@@ -426,7 +428,7 @@ class BatchRenamer:
             self.preview_names = last_operation['preview_names']
             self.update_file_list()
             self.update_preview()
-            self.status_var.set("List change undone.")
+            self.status_var.set("List change undone...")
         self.update_action_buttons_state()
 
     def redo_rename(self):
@@ -456,7 +458,7 @@ class BatchRenamer:
             self.preview_names = last_operation['preview_names']
             self.update_file_list()
             self.update_preview()
-            self.status_var.set("List change redone.")
+            self.status_var.set("List change redone...")
         self.update_action_buttons_state()
 
     def move_item_up(self):
@@ -483,6 +485,7 @@ class BatchRenamer:
         for item in selected_items:
             self.file_tree.see(item)
         self.update_action_buttons_state()
+        self.status_var.set("Moved selected item(s) up")
 
     def move_item_down(self):
         selected_items = self.file_tree.selection()
@@ -508,6 +511,7 @@ class BatchRenamer:
         for item in selected_items:
             self.file_tree.see(item)
         self.update_action_buttons_state()
+        self.status_var.set("Moved selected item(s) down")
 
     def remove_selected(self):
         selected_items = self.file_tree.selection()
