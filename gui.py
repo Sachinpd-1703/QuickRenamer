@@ -35,6 +35,8 @@ class BatchRenamer:
         # State
         self.selected_files = []
         self.preview_names = []
+        self.undo_stack = []
+        self.redo_stack = []
         self.renamer = FileRenamer()
 
         # Setup GUI
@@ -170,8 +172,11 @@ class BatchRenamer:
         button_frame = ttk.Frame(parent)
         button_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
 
-        ttk.Button(button_frame, text="Redo", command=self.rename_files).pack(side=tk.LEFT, padx=(0, 10))
-        ttk.Button(button_frame, text="undo", command=self.rename_files).pack(side=tk.LEFT, padx=(0, 10))
+        self.redo_button = ttk.Button(button_frame, text="Redo", command=self.redo_rename)
+        self.redo_button.pack(side=tk.LEFT, padx=(0, 10))
+        self.undo_button = ttk.Button(button_frame, text="Undo", command=self.undo_rename)
+        self.undo_button.pack(side=tk.LEFT, padx=(0, 10))
+        self.update_action_buttons_state()
 
         ttk.Button(button_frame, text="Rename Files", command=self.rename_files).pack(side=tk.LEFT, padx=(0, 10))
         ttk.Button(button_frame, text="Exit", command=self.root.quit).pack(side=tk.LEFT)
@@ -371,9 +376,12 @@ class BatchRenamer:
         self.status_var.set("Renaming files...")
         self.root.update()
 
-        success_count, error_count, errors = self.renamer.rename_files(
+        success_count, error_count, errors, rename_history = self.renamer.rename_files(
             self.selected_files, self.preview_names
         )
+        if rename_history:
+            self.undo_stack.append(rename_history)
+            self.redo_stack.clear()  # Optional: clear redo stack after new operation
 
         # Update status and show results
         if error_count == 0:
@@ -391,63 +399,147 @@ class BatchRenamer:
         self.update_file_list()
         self.update_preview()
 
+    def undo_rename(self):
+        if not self.undo_stack:
+            return
+
+        last_operation = self.undo_stack.pop()
+        
+        if isinstance(last_operation, list):
+            redo_operation = []
+            for old_path, new_path in reversed(last_operation):
+                try:
+                    new_path.rename(old_path)
+                    redo_operation.append((old_path, new_path))
+                except Exception as e:
+                    print(f"Undo Error: {e}")
+            self.redo_stack.append(list(reversed(redo_operation)))
+            self.clear_files()
+            self.status_var.set("Last operation undone.")
+        elif isinstance(last_operation, dict) and last_operation.get('action') == 'list_change':
+            self.redo_stack.append({
+                'selected_files': self.selected_files.copy(),
+                'preview_names': self.preview_names.copy(),
+                'action': 'list_change'
+            })
+            self.selected_files = last_operation['selected_files']
+            self.preview_names = last_operation['preview_names']
+            self.update_file_list()
+            self.update_preview()
+            self.status_var.set("List change undone.")
+        self.update_action_buttons_state()
+
+    def redo_rename(self):
+        if not self.redo_stack:
+            return
+
+        last_operation = self.redo_stack.pop()
+
+        if isinstance(last_operation, list):
+            undo_operation = []
+            for old_path, new_path in last_operation:
+                try:
+                    old_path.rename(new_path)
+                    undo_operation.append((old_path, new_path))
+                except Exception as e:
+                    print(f"Redo Error: {e}")
+            self.undo_stack.append(undo_operation)
+            self.clear_files()
+            self.status_var.set("Last operation redone.")
+        elif isinstance(last_operation, dict) and last_operation.get('action') == 'list_change':
+            self.undo_stack.append({
+                'selected_files': self.selected_files.copy(),
+                'preview_names': self.preview_names.copy(),
+                'action': 'list_change'
+            })
+            self.selected_files = last_operation['selected_files']
+            self.preview_names = last_operation['preview_names']
+            self.update_file_list()
+            self.update_preview()
+            self.status_var.set("List change redone.")
+        self.update_action_buttons_state()
+
     def move_item_up(self):
         selected_items = self.file_tree.selection()
         if not selected_items:
             return
-        
+
+        self.undo_stack.append({
+            'selected_files': self.selected_files.copy(),
+            'preview_names': self.preview_names.copy(),
+            'action': 'list_change'
+        })
+        self.redo_stack.clear()
+
         all_items = list(self.file_tree.get_children())
-        # Sort selected items by their index ascending---- to avoid messing order when moving up
         selected_indices = sorted([all_items.index(item) for item in selected_items])
-            
         for index in selected_indices:
             item = all_items[index]
             if index == 0:
                 self.file_tree.move(item, '', 'end')
             else:
                 self.file_tree.move(item, '', index - 1)
-        
-        # Re-select moved items----
         self.file_tree.selection_set(selected_items)
-
         for item in selected_items:
             self.file_tree.see(item)
+        self.update_action_buttons_state()
 
     def move_item_down(self):
         selected_items = self.file_tree.selection()
         if not selected_items:
             return
 
+        self.undo_stack.append({
+            'selected_files': self.selected_files.copy(),
+            'preview_names': self.preview_names.copy(),
+            'action': 'list_change'
+        })
+        self.redo_stack.clear()
+
         all_items = list(self.file_tree.get_children())
-
         selected_indices = sorted([all_items.index(item) for item in selected_items], reverse=True)
-
         for index in selected_indices:
             item = all_items[index]
             if index == len(all_items) - 1:
                 self.file_tree.move(item, '', 0)
             else:
                 self.file_tree.move(item, '', index + 1)
-
         self.file_tree.selection_set(selected_items)
-
         for item in selected_items:
             self.file_tree.see(item)
+        self.update_action_buttons_state()
 
     def remove_selected(self):
         selected_items = self.file_tree.selection()
         if not selected_items:
             messagebox.showwarning("No Selection", "Please select a file to remove.")
             return
-            
-        # Highest index se remove karna shuru karein taaki index shift na ho
+
+        self.undo_stack.append({
+            'selected_files': self.selected_files.copy(),
+            'preview_names': self.preview_names.copy(),
+            'action': 'list_change'
+        })
+        self.redo_stack.clear()
+
         indices_to_remove = sorted([self.file_tree.index(item) for item in selected_items], reverse=True)
-        
         for index in indices_to_remove:
             self.selected_files.pop(index)
-            
         self.update_preview()
         self.status_var.set(f"Removed {len(indices_to_remove)} files. Total: {len(self.selected_files)} files")
+        self.update_action_buttons_state()
+
+    def update_action_buttons_state(self):
+        # Enable/disable Undo and Redo ----
+        try:
+            if hasattr(self, 'undo_button'):
+                state = tk.NORMAL if self.undo_stack else tk.DISABLED
+                self.undo_button.config(state=state)
+            if hasattr(self, 'redo_button'):
+                state = tk.NORMAL if self.redo_stack else tk.DISABLED
+                self.redo_button.config(state=state)
+        except Exception as e:
+            print(f"Button state update error: {e}")
 
     def run(self):
         """Start the application"""
