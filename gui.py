@@ -16,16 +16,21 @@ class BatchRenamer:
         else:
             self.root = tk.Tk()
 
-        self.root.title("QuickRenamer")
-
         try:
             icon_file = resource_path("myicon.ico")
             self.root.iconbitmap(icon_file)
         except Exception as e:
             print(f"Icon not found or failed to load, using default. ({e})")
 
-        self.root.resizable(False, False)
+        self.root.title("QuickRenamer")
         self.center_window(800, 600)
+        self.root.resizable(False, False)
+
+        # Start with dark mode
+        # Theme Management
+        self.style = ttk.Style(self.root)
+        self.theme_var = tk.StringVar(value="dark")
+        self.style.theme_use("xpnative")
 
         # State
         self.selected_files = []
@@ -138,6 +143,14 @@ class BatchRenamer:
         ttk.Button(button_toolbar, text="▼ Move Down", command=self.move_item_down).pack(side=tk.LEFT, padx=(0, 5))
         ttk.Button(button_toolbar, text="Remove", command=self.remove_selected).pack(side=tk.LEFT, padx=(0, 5))
 
+        # --- Theame ---
+        self.theme_switch = ttk.Checkbutton(
+            button_toolbar,
+            text="Dark Mode",
+            command=self.apply_theme,
+        )
+        self.theme_switch.pack(side=tk.RIGHT, padx=(5, 0))
+
         columns = ('original', 'preview')
         self.file_tree = ttk.Treeview(list_frame, columns=columns, show='headings', height=15)
         self.file_tree.heading('original', text='Original Name')
@@ -168,6 +181,94 @@ class BatchRenamer:
     def setup_drag_drop(self):
         self.file_tree.drop_target_register(DND_FILES)
         self.file_tree.dnd_bind('<<Drop>>', self.on_drop)
+
+    def apply_theme(self):
+        """Applies the selected (light or dark) theme to the application."""
+        theme = self.theme_var.get()
+
+        if theme == "dark":
+            bg_color = "#221f1f"
+            fg_color = "#FFFFFF"
+            entry_bg = "#1c1e1f"
+            entry_fg = "#4B4B4D"
+            button_bg = "#2B2E2F"
+            select_bg = '#0078d7'
+            tree_heading_bg = '#3c3f41'
+            drop_label_fg = "#FFFFFF"
+            self.theme_var.set("light")
+        else:
+            bg_color = 'SystemButtonFace'
+            fg_color = 'SystemWindowText'
+            entry_bg = 'SystemWindow'
+            entry_fg = 'SystemWindowText'
+            button_bg = 'SystemButtonFace'
+            select_bg = '#0078d7'
+            tree_heading_bg = 'SystemButtonFace'
+            drop_label_fg = 'gray'
+            self.theme_var.set("dark")
+
+        # Apply to root window
+        self.root.configure(bg=bg_color)
+
+        # --- Frame and Labels ---
+        self.style.configure('TFrame', background=bg_color)
+        self.style.configure('TLabel', background=bg_color, foreground=fg_color)
+        self.style.configure('TLabelframe', background=bg_color, foreground=fg_color, borderwidth=2)
+        self.style.configure('TLabelframe.Label', background=bg_color, foreground=fg_color)
+
+        # --- Buttons ---
+        self.style.configure('TButton',
+                            background=button_bg,
+                            foreground=fg_color if theme == 'light' else 'black',
+                            borderwidth=2,
+                            focusthickness=2,
+                            focuscolor=fg_color)
+        self.style.map('TButton',
+                    background=[('active', '#6e7274')],
+                    foreground=[('disabled', '#a9a9a9')])
+
+        # --- Checkbutton ---
+        self.style.configure('TCheckbutton', background=bg_color, foreground=fg_color)
+        self.style.map('TCheckbutton',
+                    background=[('active', bg_color)],
+                    foreground=[('disabled', '#888888')])
+
+        # --- Entry ---
+        self.style.configure('TEntry',
+                            fieldbackground=entry_bg,
+                            foreground=entry_fg,
+                            insertcolor=fg_color,
+                            borderwidth=2,
+                            focusthickness=2,
+                            focuscolor=fg_color)
+
+        # --- Treeview ---
+        self.style.configure('Treeview',
+                            background=entry_bg,
+                            foreground=fg_color,
+                            fieldbackground=entry_bg,
+                            rowheight=25,
+                            borderwidth=1)
+        self.style.configure('Treeview.Heading',
+                            background=tree_heading_bg,
+                            foreground=fg_color if theme == 'light' else 'black',
+                            relief='flat')
+        self.style.map('Treeview.Heading',
+                    background=[('active', button_bg)])
+        self.style.map('Treeview',
+                    background=[('selected', select_bg)],
+                    foreground=[('selected', 'white')],
+                    fieldbackground=[('selected', select_bg)])
+
+        # --- Custom Widgets (drop label, status bar) ---
+        if hasattr(self, 'drop_label'):
+            self.drop_label.config(background=bg_color, foreground=drop_label_fg)
+
+        if hasattr(self, 'status_bar'):
+            self.status_bar.config(
+                background=button_bg if theme == 'light' else bg_color,
+                foreground=fg_color
+            )
 
     def center_window(self, win_w, win_h):
         # Get the screen width and height
