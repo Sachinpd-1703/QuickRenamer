@@ -170,6 +170,9 @@ class BatchRenamer:
         button_frame = ttk.Frame(parent)
         button_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
 
+        ttk.Button(button_frame, text="Redo", command=self.rename_files).pack(side=tk.LEFT, padx=(0, 10))
+        ttk.Button(button_frame, text="undo", command=self.rename_files).pack(side=tk.LEFT, padx=(0, 10))
+
         ttk.Button(button_frame, text="Rename Files", command=self.rename_files).pack(side=tk.LEFT, padx=(0, 10))
         ttk.Button(button_frame, text="Exit", command=self.root.quit).pack(side=tk.LEFT)
 
