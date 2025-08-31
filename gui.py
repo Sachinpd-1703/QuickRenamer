@@ -195,10 +195,10 @@ class BatchRenamer:
         theme = self.theme_var.get()
 
         if theme == "dark":
-            bg_color = "#221f1f"
+            bg_color = "#4E4F52"
             fg_color = "#FFFFFF"
-            entry_bg = "#1c1e1f"
-            entry_fg = "#4B4B4D"
+            entry_bg = "#484747"
+            entry_fg = "#323131"
             button_bg = "#2B2E2F"
             select_bg = '#0078d7'
             tree_heading_bg = '#3c3f41'
@@ -404,7 +404,7 @@ class BatchRenamer:
             return
 
         last_operation = self.undo_stack.pop()
-        
+
         if isinstance(last_operation, list):
             redo_operation = []
             for old_path, new_path in reversed(last_operation):
