@@ -287,6 +287,64 @@ class BatchRenamer:
         self.update_file_list()
         self.update_preview()
 
+    def move_item_up(self):
+        selected_items = self.file_tree.selection()
+        if not selected_items:
+            return
+        
+        all_items = list(self.file_tree.get_children())
+        # Sort selected items by their index ascending---- to avoid messing order when moving up
+        selected_indices = sorted([all_items.index(item) for item in selected_items])
+            
+        for index in selected_indices:
+            item = all_items[index]
+            if index == 0:
+                self.file_tree.move(item, '', 'end')
+            else:
+                self.file_tree.move(item, '', index - 1)
+        
+        # Re-select moved items----
+        self.file_tree.selection_set(selected_items)
+
+        for item in selected_items:
+            self.file_tree.see(item)
+
+    def move_item_down(self):
+        selected_items = self.file_tree.selection()
+        if not selected_items:
+            return
+
+        all_items = list(self.file_tree.get_children())
+
+        selected_indices = sorted([all_items.index(item) for item in selected_items], reverse=True)
+
+        for index in selected_indices:
+            item = all_items[index]
+            if index == len(all_items) - 1:
+                self.file_tree.move(item, '', 0)
+            else:
+                self.file_tree.move(item, '', index + 1)
+
+        self.file_tree.selection_set(selected_items)
+
+        for item in selected_items:
+            self.file_tree.see(item)
+
+    def remove_selected(self):
+        selected_items = self.file_tree.selection()
+        if not selected_items:
+            messagebox.showwarning("No Selection", "Please select a file to remove.")
+            return
+            
+        # Highest index se remove karna shuru karein taaki index shift na ho
+        indices_to_remove = sorted([self.file_tree.index(item) for item in selected_items], reverse=True)
+        
+        for index in indices_to_remove:
+            self.selected_files.pop(index)
+            
+        self.update_preview()
+        self.status_var.set(f"Removed {len(indices_to_remove)} files. Total: {len(self.selected_files)} files")
+
     def run(self):
         """Start the application"""
         self.root.mainloop()
