@@ -50,8 +50,7 @@ No Python or dependencies required — just download and run the installer.
 <img width="697" height="487" alt="image" src="https://github.com/user-attachments/assets/bf9cfe01-dfe2-4daa-8cdb-58ff64ef0be2" />
 
 ## 🔗 Project Info  
-- **Author:** Sachin Prasad & Shubham Singh
+- **Author:** [Sachin Prasad](https://github.com/Sachinpd-1703) & [Shubham Singh](https://github.com/shubham4734singh)  
 - **Version:** 1.2.0  
 - **GitHub Repo:** [QuickRenamer](https://github.com/Sachinpd-1703/QuickRenamer)  
-
 ---
