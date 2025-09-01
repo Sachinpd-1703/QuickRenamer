@@ -1,56 +1,76 @@
-# QuickRenamer  
-Fast and simple bulk file renaming tool with a clean Tkinter GUI.  
-Supports drag-and-drop, prefix/suffix, sequential numbering, and more.  
+<p align="center">
+  <h1 align="center">QuickRenamer</h1>
+  <p align="center">
+    Fast and simple bulk file renaming tool with a clean Tkinter GUI.
+    <br />
+    Supports drag-and-drop, prefix/suffix, sequential numbering, and more.
+  </p>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/Sachinpd-1703/QuickRenamer?style=for-the-badge" alt="Version">
+  <img src="https://img.shields.io/github/downloads/Sachinpd-1703/QuickRenamer/total?style=for-the-badge" alt="Downloads">
+  <img src="https://img.shields.io/github/license/Sachinpd-1703/QuickRenamer?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/github/stars/Sachinpd-1703/QuickRenamer?style=for-the-badge" alt="Stars">
+</p>
 
 ---
 
-## 📌 About  
-**QuickRenamer** is a lightweight batch file renaming tool for **Windows**.  
-It allows you to quickly rename multiple files in sequence with customizable options, all in an intuitive graphical interface.  
+## 📌 About QuickRenamer
 
-No Python or dependencies required — just download and run the installer.  
+**Tired of renaming files one by one?** **QuickRenamer** is a lightweight, intuitive, and powerful batch file renaming tool built for **Windows**. It simplifies the tedious task of renaming multiple files, allowing you to apply custom naming rules in seconds.
 
----
-
-## ✨ Features  
-- Rename multiple files at once in sequence (`image1`, `image2`, `image3`, etc.)  
-- Add **prefix** and/or **suffix** to file names  
-- **Drag-and-drop** files directly into the app  
-- Automatically **previews new names** as you type  
-- **Undo / Redo System** — Quickly revert or reapply actions  
-- **Reorder Files (Move Up / Down)** — Adjust file order in preview before renaming  
-- **Remove Files from Preview** — Clean up your selection by removing unnecessary files  
-- **Dark / Light Theme Toggle** — Switch between modern dark mode and classic light mode  
+Whether you're organizing photos, documents, or project files, QuickRenamer offers a clean graphical interface to get the job done efficiently. No complex commands, no dependencies—just a simple `.exe` installer.
 
 ---
 
-## 🚀 What’s New in v1.2.0  
-- 🔄 Added Undo / Redo system  
-- ⬆️⬇️ Reorder files in preview  
-- 🗑️ Remove files individually  
-- 🌙☀️ Dark/Light theme toggle  
+## 📸 Screenshots
+
+[Image of QuickRenamer dark and light modes side-by-side]
+
+<p align="center">
+  <img width="697" alt="QuickRenamer Interface" src="https://github.com/user-attachments/assets/c18f8fc7-24be-474d-91f1-2b14f89e6716">
+</p>
 
 ---
 
-## 📥 Installation (Windows Only)  
-1. Download the latest **QuickRenamer Setup.exe** from [Releases](https://github.com/Sachinpd-1703/QuickRenamer/releases).  
-2. Run the installer and follow the setup wizard.  
-3. Launch **QuickRenamer** from the Start Menu or Desktop shortcut.  
+## ✨ Key Features
+
+* **Sequential Renaming:** Rename files in a sequence like `image-01`, `image-02`, `image-03`.
+* **✍️ Prefix & Suffix:** Easily add custom text to the beginning or end of filenames.
+* **🖐️ Drag & Drop:** Simply drag your files and folders directly into the application window.
+* **👁️ Live Preview:** Instantly see how your new filenames will look before you apply changes.
+* **🔄 Undo / Redo:** Made a mistake? Quickly revert actions or re-apply them with a single click.
+* **↕️ Reorder Files:** Adjust the processing order by moving files up or down in the list.
+* **🗑️ Selective Removal:** Remove individual files from the list before renaming.
+* **🎨 Dual Themes:** Switch between a modern **Dark Mode** and a classic **Light Mode** to suit your preference.
 
 ---
 
-## 🛠 Developer Notes  
-- Focused on **user control and flexibility**  
-- Core **stability and performance remain unchanged**  
-- **Future roadmap:** Pattern-based renaming, presets, and cross-platform builds  
+## 📥 Installation (Windows Only)
+
+Getting started is easy:
+
+1.  Go to the [**Releases Page**](https://github.com/Sachinpd-1703/QuickRenamer/releases).
+2.  Download the latest `QuickRenamer-Setup.exe` file.
+3.  Run the installer and follow the on-screen instructions.
+4.  Launch **QuickRenamer** from your Start Menu or Desktop shortcut!
 
 ---
 
-## 📸 Screenshots  
-<img width="697" height="487" alt="image" src="https://github.com/user-attachments/assets/c18f8fc7-24be-474d-91f1-2b14f89e6716">
+## 🚀 How to Use
 
-## 🔗 Project Info  
-- **Author:** [Sachin Prasad](https://github.com/Sachinpd-1703) & [Shubham Singh](https://github.com/shubham4734singh)  
-- **Version:** 1.2.0  
-- **GitHub Repo:** [QuickRenamer](https://github.com/Sachinpd-1703/QuickRenamer)  
----
+1.  **Add Files:** Drag and drop files or folders into the app, or use the "Add Files" button.
+2.  **Set Naming Rules:** Enter a **New Name**, along with an optional **Prefix** or **Suffix**.
+3.  **Preview:** The app will automatically show you a preview of the new filenames.
+4.  **Rename:** Happy with the preview? Click the **"Start Renaming"** button!
+
+**Example:**
+```diff
+- vacation_photo_8362.jpg
+- vacation_photo_8363.jpg
+- vacation_photo_8364.jpg
+
++ SummerTrip-01.jpg
++ SummerTrip-02.jpg
++ SummerTrip-03.jpg
