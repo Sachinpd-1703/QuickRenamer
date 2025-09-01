@@ -47,7 +47,7 @@ No Python or dependencies required — just download and run the installer.
 ---
 
 ## 📸 Screenshots  
-<img width="697" height="487" alt="image" src="https://github.com/user-attachments/assets/bf9cfe01-dfe2-4daa-8cdb-58ff64ef0be2" />
+<img width="697" height="487" alt="image" src="https://github.com/user-attachments/assets/c18f8fc7-24be-474d-91f1-2b14f89e6716">
 
 ## 🔗 Project Info  
 - **Author:** [Sachin Prasad](https://github.com/Sachinpd-1703) & [Shubham Singh](https://github.com/shubham4734singh)  
