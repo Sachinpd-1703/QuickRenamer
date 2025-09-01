@@ -1,1 +1,22 @@
+QuickRenamer v1.2
 
+QuickRenamer is a lightweight batch file renaming tool built with Python and Tkinter.
+This update builds upon the initial stable release (v1.0.0) with major usability improvements.
+
+✨ New in v1.2.0
+
+🔄 Undo / Redo System — Quickly revert or reapply actions.
+
+⬆️⬇️ Reorder Files (Move Up / Down) — Adjust the file order in preview before renaming.
+
+🗑️ Remove Files from Preview — Clean up your selection by removing unnecessary files.
+
+🌙☀️ Dark / Light Theme Toggle — Switch between modern dark mode and classic light mode.
+
+🛠 Developer Notes
+
+-> Focused on user control and flexibility.
+
+-> Core stability and performance remain unchanged.
+
+-> Future roadmap: Pattern-based renaming, presets, and cross-platform builds.
