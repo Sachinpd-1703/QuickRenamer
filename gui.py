@@ -26,7 +26,7 @@ class BatchRenamer:
         self.center_window(800, 600)
         self.root.resizable(False, False)
 
-        # Start with dark mode
+        # Start with dark mode -
         # Theme Management
         self.style = ttk.Style(self.root)
         self.theme_var = tk.StringVar(value="dark")
